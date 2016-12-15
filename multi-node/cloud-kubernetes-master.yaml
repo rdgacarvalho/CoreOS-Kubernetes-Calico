@@ -2,7 +2,6 @@
 hostname: "kubemaster"
 
 ssh_authorized_keys:
-  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD037qxy/sqLljZ/50+jFFTArgx0SYRytQcRIbIvUusdLG5CK/oHF+ZfSNZLNQUFuKyaUOJWXaug7VOzqIGliaNvXsoB5iKTP5RXdFXdZ2oCzPx/bXbCdxqfvV78GVIb0o/r4xI8xlR326gwDhDpb/Oy0R2PP98VBLhIWc1T5C4zGESd/IuPmWHEYl4c4ctG1qVgaOIz52RawM22Q/4jXpAbitFiKMJxyz6olQy61zZ9e77u9Ad4c2cHW8gTGiz8eYCR5dTHV38jFk7NxwHzYWdHQ0XmbVRXgzHuLQjCwfkpuqDvZujoam8deDwcdbESgqalugLKHANv8+bjiqnc1EZ root@glaedr.ellesmera
   - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCWM7xMnzcy1hTjxoV7/Cc8lSeoWhUUPsoNbFSkL9wiLq++SqscipEeA3HRYlI7X9VJbhCWRYAA5AKj7hGMZ60sByzvo8nSJVN54zcOfH5wnJKdO3FJeQfYkyqYsBpC8Kg0+dILtvhxgf5KenFQkPnb8DXmNExvm/jzJgu2YbOSmKcSvt9zQnHTj7AAILC8GozYonJEzE5Yo8JiKUbVSBq9lL54dbi/47QhfhIjKbK7n4+tbsU/aLPKauv+NW2jj69tIycg6WnoarSeUNZy8/zUtcMqwfrilxuDw+9Gl+o+aXeVbwpkOw6D0bPeWkOwY0CkdyOKfwiW5tP4VUF70VOr drigocar@AC049707
 
 users:
@@ -12,7 +11,6 @@ users:
       - "sudo"
       - "docker"
     ssh-authorized-keys:
-    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD037qxy/sqLljZ/50+jFFTArgx0SYRytQcRIbIvUusdLG5CK/oHF+ZfSNZLNQUFuKyaUOJWXaug7VOzqIGliaNvXsoB5iKTP5RXdFXdZ2oCzPx/bXbCdxqfvV78GVIb0o/r4xI8xlR326gwDhDpb/Oy0R2PP98VBLhIWc1T5C4zGESd/IuPmWHEYl4c4ctG1qVgaOIz52RawM22Q/4jXpAbitFiKMJxyz6olQy61zZ9e77u9Ad4c2cHW8gTGiz8eYCR5dTHV38jFk7NxwHzYWdHQ0XmbVRXgzHuLQjCwfkpuqDvZujoam8deDwcdbESgqalugLKHANv8+bjiqnc1EZ root@glaedr.ellesmera
     - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCWM7xMnzcy1hTjxoV7/Cc8lSeoWhUUPsoNbFSkL9wiLq++SqscipEeA3HRYlI7X9VJbhCWRYAA5AKj7hGMZ60sByzvo8nSJVN54zcOfH5wnJKdO3FJeQfYkyqYsBpC8Kg0+dILtvhxgf5KenFQkPnb8DXmNExvm/jzJgu2YbOSmKcSvt9zQnHTj7AAILC8GozYonJEzE5Yo8JiKUbVSBq9lL54dbi/47QhfhIjKbK7n4+tbsU/aLPKauv+NW2jj69tIycg6WnoarSeUNZy8/zUtcMqwfrilxuDw+9Gl+o+aXeVbwpkOw6D0bPeWkOwY0CkdyOKfwiW5tP4VUF70VOr drigocar@AC049707
 
 write_files:
@@ -31,8 +29,8 @@ write_files:
     - path: /etc/resolv.conf
       content: |
         search ellesmera
-        nameserver 201.17.1.97
-        nameserver 192.168.1.1
+        nameserver 8.8.8.8
+        nameserver 8.8.4.4
 
     - path: /opt/bin/create_dirs
       owner: root
@@ -317,9 +315,6 @@ write_files:
         ############### Start Script ####################
 
         echo "Kubernetes set up start...";
-        echo "core:05digo10" | chpasswd core
-        echo "05digo10" | ssh-copy-id -i ~core/.ssh/id_rsa.pub core@worker1
-        echo "05digo10" | ssh-copy-id -i ~core/.ssh/id_rsa.pub core@worker2
         echo "";
         create_ca
 
