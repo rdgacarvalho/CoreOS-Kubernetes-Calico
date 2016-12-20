@@ -29,8 +29,8 @@ write_files:
     - path: /etc/resolv.conf
       content: |
         search ellesmera
-        nameserver 8.8.8.8
-        nameserver 8.8.4.4
+        nameserver 189.38.95.95
+        nameserver 10.1.0.1
 
     - path: /opt/bin/create_dirs
       owner: root
