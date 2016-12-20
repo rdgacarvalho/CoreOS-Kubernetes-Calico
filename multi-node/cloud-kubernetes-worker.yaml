@@ -1,5 +1,5 @@
 #cloud-config
-hostname: "node1"
+hostname: "worker1"
 ssh_authorized_keys:
   - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCWM7xMnzcy1hTjxoV7/Cc8lSeoWhUUPsoNbFSkL9wiLq++SqscipEeA3HRYlI7X9VJbhCWRYAA5AKj7hGMZ60sByzvo8nSJVN54zcOfH5wnJKdO3FJeQfYkyqYsBpC8Kg0+dILtvhxgf5KenFQkPnb8DXmNExvm/jzJgu2YbOSmKcSvt9zQnHTj7AAILC8GozYonJEzE5Yo8JiKUbVSBq9lL54dbi/47QhfhIjKbK7n4+tbsU/aLPKauv+NW2jj69tIycg6WnoarSeUNZy8/zUtcMqwfrilxuDw+9Gl+o+aXeVbwpkOw6D0bPeWkOwY0CkdyOKfwiW5tP4VUF70VOr drigocar@AC049707
 
@@ -28,8 +28,8 @@ write_files:
 
   - path: /etc/resolv.conf
     content: |
-      nameserver 8.8.8.8
-      nameserver 8.8.4.4
+      nameserver 189.38.95.95
+      nameserver 10.1.0.1
 
   # cria diretorios
   - path: /opt/bin/create_dirs.sh
@@ -308,8 +308,8 @@ write_files:
           chmod 600 /etc/kubernetes/ssl/*-key.pem
           chown root:root /etc/kubernetes/ssl/*-key.pem
 
-          ln -s worker1-worker.pem worker.pem
-          ln -s worker1-worker-key.pem worker-key.pem
+          ln -s $(hostname)-worker.pem worker.pem
+          ln -s $(hostname)-worker-key.pem worker-key.pem
 
           daemon_reload
 
