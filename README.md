@@ -1,2 +1,5 @@
 # CoreOS and Kubernetes
-This project is dedicated to explanation CoreOS how to configure Kubernetes on CoreOS automatic.
+This project is dedicated to install and configure Kubernetes running on CoreOS automatic.
+Feel free to change any script and configs.
+
+Welcome.
