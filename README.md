@@ -8,3 +8,12 @@ Welcome to new era of containers applications.
 Kubernetes is an open-source system for automating deployment, scaling, and management of containerized applications.
 
 # Why use Kubernetes?
+
+* Automatic binpacking            
+* Self-healing              
+* Horizontal scaling            
+* Service discovery and load balancing
+* Automated rollouts and rollbacks
+* Secret and configuration management
+* Storage orchestration
+* Batch execution
