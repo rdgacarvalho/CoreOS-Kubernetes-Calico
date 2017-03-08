@@ -206,4 +206,5 @@ function setup_kubectl()
 }
 
 ############### Start Script ####################
+
 $@
