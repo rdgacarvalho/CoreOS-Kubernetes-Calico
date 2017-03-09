@@ -18,9 +18,8 @@ Kubernetes is an open-source system for automating deployment, scaling, and mana
 * [Storage orchestration]
 * [Batch execution]
 
+# Install CoreOS using YAML file
+
 ## Authors
 
 * **Rodrigo Andrade de Carvalho** - *Initial work*
-
-![alt tag] (https://kubernetes.io/images/nav_logo2.svg "CoreOS Linux")
-![alt tag] (https://coreos.com/assets/images/partners/docker.png)
