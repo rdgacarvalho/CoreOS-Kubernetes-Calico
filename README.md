@@ -19,6 +19,9 @@ Kubernetes is an open-source system for automating deployment, scaling, and mana
 * [Batch execution]
 
 # Install CoreOS using YAML file
+```
+coming soon
+```
 
 ## Authors
 
