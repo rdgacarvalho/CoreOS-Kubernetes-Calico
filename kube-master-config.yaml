@@ -1,4 +1,5 @@
 #cloud-config
+
 hostname: "kubemaster.ellesmera.intranet"
 
 ssh_authorized_keys:
@@ -15,6 +16,7 @@ users:
 
 write_files:
 
+    # Set up hosts file
     - path: /etc/hosts
       owner: root
       content: |
@@ -27,12 +29,14 @@ write_files:
              192.168.1.20   kubemaster kubemaster.ellesmera.intranet
              10.1.0.20      master1 master1.ellesmera.intranet
 
+    # setup resolv.conf file
     - path: /etc/resolv.conf
       content: |
         search ellesmera
         nameserver 189.38.95.95
         nameserver 10.1.0.1
 
+    # create directories structure
     - path: /opt/bin/create_dirs
       owner: root
       permissions: 0755
@@ -262,7 +266,6 @@ write_files:
           echo "Create the kubelet Unit ..."
           eval sed -i -e 's#\\\${ADVERTISE_IP}#"$ADV_IP"#g' /etc/systemd/system/kubelet.service
           eval sed -i -e 's#\\\${DNS_SERVICE_IP}#"$DNS_SERVICE"#g' /etc/systemd/system/kubelet.service
-          eval sed -i -e 's#\\\${K8S_VER}#"$K8S"#g' /etc/systemd/system/kubelet.service
           eval sed -i -e 's#\\\${NETWORK_PLUGIN}#"$NETWORK"#g' /etc/systemd/system/kubelet.service
 
           echo "Set Up the kube-apiserver Pod ..."
@@ -280,8 +283,14 @@ write_files:
           echo "Set Up the CNI config (optional) ..."
           # eval sed -i -e 's#\\\${ADVERTISE_IP}#"$ADV_IP"#g' /etc/kubernetes/cni/net.d/10-calico.conf
           # eval sed -i -e 's#\\\$ETCD_ENDPOINTS#"$ETCD_END"#g' /etc/kubernetes/cni/net.d/10-calico.conf
-          eval sed -i -e 's#\\\$ETCD_ENDPOINTS#"$ETCD_END"#g' /etc/kubernetes/manifests/calico.yaml
+          eval sed -i -e 's#\\\${ETCD_ENDPOINTS}#"$ETCD_END"#g' /etc/kubernetes/manifests/calico.yaml
 
+          echo "Set up hyperkube version"
+          eval sed -i -e 's#\\\${K8S_VER}#"$K8S"#g' /etc/systemd/system/kubelet.service
+          eval sed -i -e 's#\\\${K8S_VER}#"$K8S"#g' /etc/systemd/system/kube-apiserver.yaml
+          eval sed -i -e 's#\\\${K8S_VER}#"$K8S"#g' /etc/systemd/system/kube-proxy.yaml
+          eval sed -i -e 's#\\\${K8S_VER}#"$K8S"#g' /etc/systemd/system/kube-controller-manager.yaml
+          eval sed -i -e 's#\\\${K8S_VER}#"$K8S"#g' /etc/systemd/system/kube-scheduler.yaml
 
           setup_certs
 
@@ -801,12 +810,16 @@ coreos:
         RemainAfterExit=yes
         ExecStart=/usr/sbin/modprobe cpufreq_powersave
 
+    - name: systemd-networkd.service
+      command: start
+      enable: true
+
     - name: kubeconfig.service
       command: start
       enable: true
       content: |
         [Unit]
-        Description=Enable Kubeconfig Service
+        Description=Execute Kubeconfig Service
         After=systemd-networkd.service
         Requires=systemd-networkd.service
 
@@ -816,9 +829,13 @@ coreos:
         ExecReload=/etc/kubernetes/ssl/kubeconfig.sh main
         RemainAfterExit=yes
 
-    - name: systemd-networkd.service
+    - name: flanneld.service
       command: start
-      enable: true
+      drop-ins:
+      - name: 50-network-config.conf
+        content: |
+          [Service]
+          ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.0.1.0/16", "Backend": {"Type": "vxlan"}}'
 
     - name: etcd2.service
       command: start
@@ -836,13 +853,6 @@ coreos:
       command: start
       enable: true
 
-    - name: flanneld.service
-      command: start
-      drop-ins:
-      - name: 50-network-config.conf
-        content: |
-          [Service]
-          ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.0.1.0/16", "Backend": {"Type": "vxlan"}}'
   etcd2:
      name: master1
      initial-advertise-peer-urls: http://10.1.0.20:2380
