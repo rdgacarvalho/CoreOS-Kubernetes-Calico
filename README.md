@@ -19,10 +19,10 @@ Kubernetes is an open-source system for automating deployment, scaling, and mana
 * [Batch execution]
 
 # Install CoreOS using YAML file
+After define your networking information like "IP Address and Hostnames", replace the variables inside kubeconfig.sh script and kube-master-config.yaml file.
 ```
-coming soon
+For example:
 ```
-
 ## Authors
 
 * **Rodrigo Andrade de Carvalho** - *Initial work*
