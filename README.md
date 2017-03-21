@@ -22,7 +22,7 @@ Kubernetes is an open-source system for automating deployment, scaling, and mana
 After define your networking information like "IP Address and Hostnames", replace the variables inside kubeconfig.sh script and kube-master-config.yaml file.
 ```
 For example:
-#coreos-install -d /dev/sda -c kube-master-config.yaml
+
 ```
 ## Authors
 
