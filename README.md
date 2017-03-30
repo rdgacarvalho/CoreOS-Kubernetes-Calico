@@ -21,17 +21,13 @@ Kubernetes is an open-source system for automating deployment, scaling, and mana
 # Install CoreOS using YAML file
 After define your networking information like "IP Address and Hostnames", replace the variables inside kubeconfig.sh script and kube-master-config.yaml file.
 
-Example 1:
+Step 1: Installing Kubernetes Master
 ```
-Installing Kubernetes Master
-
 core@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-master.yaml
 ```
 
-Example 2:
+Step 2: Installing Kubernetes Workers
 ```
-Installing Kubernetes Workers
-
 coreos@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-worker.yaml
 ```
 
