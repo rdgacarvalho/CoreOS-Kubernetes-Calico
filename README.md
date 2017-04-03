@@ -30,7 +30,7 @@ Step 2: Installing Kubernetes Workers
 ```
 coreos@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-worker.yaml
 
-Repeat this step for each worker node of your CoreOS cluster. Rememebr replace the "hostname", "ip address", 
+Repeat this step for each worker node of your CoreOS cluster. Remember to replace the "hostname", "ip address", 
 ```
 
 
