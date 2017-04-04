@@ -1,0 +1,97 @@
+---
+
+- name: Fix docker to have a provisioned iops drive
+  hosts: all
+  user: root
+  connection: ssh
+#  gather_facts: no
+
+  vars:
+   - bushosts:
+      - ['host0','host1','host2']
+
+  tasks:
+
+  - name: disable selinux
+    command: /usr/sbin/setenforce 0
+    ignore_errors: true
+
+  - name: Scan Docker Devicemapper Disk
+    shell: echo "- - -" > /sys/class/scsi_host/"{{item}}"/scan
+    with_items:
+     - host0
+     - host1
+     - host2
+
+  - name: Create Docker PV
+    shell: parted -s /dev/sdb --script -- mklabel msdos mkpart primary 0% 100% set 1 lvm on
+
+  - name: Create Docker VG
+    lvg:
+      vg: dockervg
+      pvs: /dev/sdb1
+
+  - name: Create thinpoollv in Docker VG
+    shell: lvcreate --wipesignatures y -n thinpoollv dockervg -l 95%VG
+    register: extend_output
+
+  - pause:
+      seconds: 3
+
+  - name: Create thinpoolmetalv in Docker VG
+    command: lvcreate --wipesignatures y -n thinpoolmetalv dockervg -l 1%VG
+    register: extend_output
+
+  - name: Convert from pool to a thinpool Docker LV
+    command: lvconvert -y --zero n -c 512K --thinpool dockervg/thinpoollv --poolmetadata dockervg/thinpoolmetalv
+    register: extend_output
+
+  - name: Copy docker-thinpool.profile to remote hosts
+    copy:
+       src: ../templates/docker-thinpool.profile
+       dest: /etc/lvm/profile/docker-thinpool.profile
+       owner: root
+       group: root
+       mode:  0644
+    register: extend_output
+
+  - name: Set Up lvm Docker profile
+    command: lvchange --metadataprofile docker-thinpool dockervg/thinpoollv
+    register: extend_output
+
+  - name: Install Docker Engine
+    yum:
+      name: docker-engine
+      state: latest
+
+  - name: Enable Docker Service
+    shell: systemctl enable docker
+    notify:
+      - start docker
+
+
+  - name: Copy Docker Daemon to remote hosts
+    copy:
+       src: ../templates/daemon.json
+       dest: /etc/docker/daemon.json
+       owner: root
+       group: root
+       mode:  0644
+    register: extend_output
+
+  - debug: var=extend_output
+
+  - name: Start docker info
+    command: systemctl start docker
+    register: docker_start
+
+  - debug: var=dockerinfo
+
+  - name: validate devicemapper
+    command: lsblk
+    register: extend_output
+
+  handlers:
+
+   - name: start docker
+     command: systemctl start docker
