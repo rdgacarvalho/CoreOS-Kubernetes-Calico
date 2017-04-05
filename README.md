@@ -60,6 +60,7 @@ etcd2:
      initial-cluster-state: new
 ```
 
+##### Installing CoreOS Kubermaster 
 ```
 core@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-master.yaml
 ```
@@ -74,4 +75,6 @@ Repeat this step for each worker node of your CoreOS cluster. Remember to replac
 
 ## Authors
 
-* **Rodrigo Andrade de Carvalho** - *Initial work*
+* **Rodrigo Andrade de Carvalho**
+* **E-mail: rdgacarvalho@gmail.com**
+* **Skype: rdgacarvalho**
