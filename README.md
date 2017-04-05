@@ -1,9 +1,10 @@
-# CoreOS 
+# What is CoreOS?
+
 CoreOS is a Linux version dedicated to running docker containers, nowdays called Container Linux CoreOS was designed for painless management in large clusters.
 
 Welcome to new era of containers applications.
 
-# Kubernetes
+# What is Kubernetes?
 
 Kubernetes is an open-source system for automating deployment, scaling, and management of containerized applications.
 
@@ -18,7 +19,7 @@ Kubernetes is an open-source system for automating deployment, scaling, and mana
 * [Storage orchestration]
 * [Batch execution]
 
-# Install CoreOS using YAML file
+# Install CoreOS Linux Container
 
 After define your networking information like "IP Address and Hostnames", replace the variables inside cloud-kubernetes-master.yaml and kubeconfig.sh file as show below.
 
@@ -27,6 +28,7 @@ After define your networking information like "IP Address and Hostnames", replac
 ## Installing Kubernetes Master
 
 ##### Step 1: Set up your hostname
+
 ```
 hostname: "kubemaster"
 ```
@@ -38,6 +40,7 @@ ssh_authorized_keys:
 ```
 
 ##### Step 3: Replace all IP address below for yours infrastructure
+
 ```  
 MASTER_IP=192.168.1.20
 K8S_IP=10.3.0.1
@@ -50,6 +53,7 @@ K8S_SERVICE_IP=10.3.0.1
 ```
 
 ###### Step 3: Replace for your IP address to configure your etcd2 cluster
+
 ```
 etcd2:
      name: master1
@@ -62,20 +66,21 @@ etcd2:
      initial-cluster-state: new
 ```
 
-##### Step 4: Installing CoreOS Kubermaster 
+##### Step 4: Installing CoreOS Kubermaster
+
 ```
 core@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-master.yaml
 ```
 
 ## Installing Kubernetes Workers
+
+> Repeat this step for each worker node of your CoreOS cluster. Remember to replace the "hostname", "ip address"
+
 ```
 coreos@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-worker.yaml
-
-Repeat this step for each worker node of your CoreOS cluster. Remember to replace the "hostname", "ip address", 
 ```
 
-
-## Authors
+## Author
 
 * **Rodrigo Andrade de Carvalho**
 * **E-mail: rdgacarvalho@gmail.com**
