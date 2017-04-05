@@ -1,4 +1,4 @@
-# Ansible Area
+# Ansible
 
 ## Configure Docker to use Device Mapper instead of overlay
 
