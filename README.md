@@ -24,20 +24,20 @@ After define your networking information like "IP Address and Hostnames", replac
 
 ## Pay attention: All changes should be made into cloud-kubernetes-master.yaml file
 
-## Step 1: Installing Kubernetes Master
+## Installing Kubernetes Master
 
-##### Set up your hostname
+##### Step 1: Set up your hostname
 ```
 hostname: "kubemaster"
 ```
 
-##### Configure your SSH plublic key
+##### Step 2: Configure your SSH plublic key
 ```
 ssh_authorized_keys:
   - ssh-rsa <your_ssh_key.pub>
 ```
 
-##### Replace all IP address below for yours infrastructure
+##### Step 3: Replace all IP address below for yours infrastructure
 ```  
 MASTER_IP=192.168.1.20
 K8S_IP=10.3.0.1
@@ -49,7 +49,7 @@ MASTER_IP=("192.168.1.20")
 K8S_SERVICE_IP=10.3.0.1
 ```
 
-###### Replace for your IP address to configure your etcd2 cluster
+###### Step 3: Replace for your IP address to configure your etcd2 cluster
 ```
 etcd2:
      name: master1
@@ -58,16 +58,16 @@ etcd2:
      listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
      advertise-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
      initial-cluster-token: cluster-ellesmera
-     initial-cluster: worker1=http://10.1.0.5:2380,worker2=http://10.1.0.6:2380,master1=http://10.1.0.20:2380
+     initial-cluster: master1=http://10.1.0.20:2380,master2=http://10.1.0.21:2380
      initial-cluster-state: new
 ```
 
-##### Installing CoreOS Kubermaster 
+##### Step 4: Installing CoreOS Kubermaster 
 ```
 core@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-master.yaml
 ```
 
-Step 2: Installing Kubernetes Workers
+## Installing Kubernetes Workers
 ```
 coreos@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-worker.yaml
 
