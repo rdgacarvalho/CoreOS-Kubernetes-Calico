@@ -20,7 +20,9 @@ Kubernetes is an open-source system for automating deployment, scaling, and mana
 
 # Install CoreOS using YAML file
 
-After define your networking information like "IP Address and Hostnames", replace the variables inside kube-master-config.yaml and kubeconfig.sh file as show below.
+After define your networking information like "IP Address and Hostnames", replace the variables inside cloud-kubernetes-master.yaml and kubeconfig.sh file as show below.
+
+## Pay attention: All changes should be made into cloud-kubernetes-master.yaml file
 
 ## Step 1: Installing Kubernetes Master
 
