@@ -6,10 +6,6 @@
   connection: ssh
 #  gather_facts: no
 
-  vars:
-   - bushosts:
-      - ['host0','host1','host2']
-
   tasks:
 
   - name: disable selinux
@@ -17,11 +13,7 @@
     ignore_errors: true
 
   - name: Scan Docker Devicemapper Disk
-    shell: echo "- - -" > /sys/class/scsi_host/"{{item}}"/scan
-    with_items:
-     - host0
-     - host1
-     - host2
+    shell: echo 0 0 0 | tee /sys/class/scsi_host/host*/scan
 
   - name: Create Docker PV
     shell: parted -s /dev/sdb --script -- mklabel msdos mkpart primary 0% 100% set 1 lvm on
@@ -68,7 +60,6 @@
     shell: systemctl enable docker
     notify:
       - start docker
-
 
   - name: Copy Docker Daemon to remote hosts
     copy:
