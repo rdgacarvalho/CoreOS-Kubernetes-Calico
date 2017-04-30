@@ -62,7 +62,7 @@ etcd2:
      listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
      advertise-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
      initial-cluster-token: cluster-ellesmera
-     initial-cluster: master1=http://10.1.0.20:2380,master2=http://10.1.0.21:2380
+     initial-cluster: master1=http://10.1.0.20:2380
      initial-cluster-state: new
 ```
 
@@ -74,7 +74,7 @@ core@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-master.yaml
 
 ## Installing Kubernetes Workers
 
-> Repeat this step for each worker node of your CoreOS cluster. Remember to replace the "hostname", "ip address"
+> Repeat this step for each worker node of your CoreOS cluster. Remember to replace the "hostname" and "ip address" into cloud-kubernetes-worker.yml file before start the instalion proccess.
 
 ```
 coreos@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-worker.yaml
