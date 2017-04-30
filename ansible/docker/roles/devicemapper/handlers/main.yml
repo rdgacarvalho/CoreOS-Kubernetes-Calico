@@ -1,0 +1,5 @@
+---
+# Handler for docker
+
+- name: start docker
+  shell: systemctl start docker
