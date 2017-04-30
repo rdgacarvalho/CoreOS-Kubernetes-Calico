@@ -25,7 +25,7 @@ function main()
   # kubernetes master setup
   ADV_IP=${MASTERIP}
   # Etcd cluster member list
-  ETCD_END=http://10.1.0.5:2379,http://10.1.0.6:2379,http://10.1.0.7:2379,http://10.1.0.20:2379
+  ETCD_END=http://10.1.0.5:2379,http://10.1.0.6:2379,http://10.1.0.7:2379
   K8S=v1.5.1_coreos.0
   NETWORK=cni
   SERVICE_RANGE=10.3.0.0/24
