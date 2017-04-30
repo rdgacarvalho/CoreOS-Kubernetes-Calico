@@ -1,15 +1,15 @@
-# Welcome to Ansible area
+# Ansible area
 
-## Here you will find a playbooks to configure docker to use device mapper (LVM)
+Here you will find a playbooks to configure docker to use device mapper (LVM)
 
-#### Remember to define your invetory into the host file of your ansible controller.
+Remember to define your invetory into the host file of your ansible controller.
 
 # Infrastructure:
 
-* Docker Swarm
+1. Docker Swarm
 
-* 01 manager
-* 03 workers
+  1. 01 manager
+  2. 03 workers
 
 
 ## 1 - Add a new hard disk (HD) on-the-fly to your servers on your cluster. After that just running the playbook from the manager.
@@ -18,7 +18,7 @@
 
 
 ```
-ansible-playbook -C docker-devicemapper.yml -v
+# ansible-playbook -C docker-devicemapper.yml -v
 ```
 
 ## The command above you'll check all tasks inside "docker-devicemapper.yml" without execute any task in the server(s).
@@ -29,6 +29,6 @@ ansible-playbook -C docker-devicemapper.yml -v
 # ansible-playbook docker-devicemapper.yml -v
 ```
 
-## This playbook is compatible with any Linux flavor, so don't worries about you distro. 
+This playbook is compatible with any Linux flavor, so don't worries about you distro.
 
-Thank you!
+###### Thank you!
