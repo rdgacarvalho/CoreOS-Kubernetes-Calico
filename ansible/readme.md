@@ -20,7 +20,7 @@ Remember to define your invetory into the host file of your ansible controller.
 # ansible-playbook -C docker-devicemapper.yml -v
 ```
 
-_The command above you'll check all tasks inside "docker-devicemapper.yml" without execute any task in the server(s).
+_The command above you'll check all tasks inside "docker-devicemapper.yml" without execute any task in the server(s)._
 
 ###### 3 - Execute the playbook
 
