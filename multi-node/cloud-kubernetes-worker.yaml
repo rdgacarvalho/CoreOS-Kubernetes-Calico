@@ -1,7 +1,10 @@
 #cloud-config
+
 hostname: "worker1"
+
 ssh_authorized_keys:
   - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCWM7xMnzcy1hTjxoV7/Cc8lSeoWhUUPsoNbFSkL9wiLq++SqscipEeA3HRYlI7X9VJbhCWRYAA5AKj7hGMZ60sByzvo8nSJVN54zcOfH5wnJKdO3FJeQfYkyqYsBpC8Kg0+dILtvhxgf5KenFQkPnb8DXmNExvm/jzJgu2YbOSmKcSvt9zQnHTj7AAILC8GozYonJEzE5Yo8JiKUbVSBq9lL54dbi/47QhfhIjKbK7n4+tbsU/aLPKauv+NW2jj69tIycg6WnoarSeUNZy8/zUtcMqwfrilxuDw+9Gl+o+aXeVbwpkOw6D0bPeWkOwY0CkdyOKfwiW5tP4VUF70VOr drigocar@AC049707
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIjWNEUigHQV8Hjnb64XhrG6xApRNPhgxh1pUj3zrS0v5CsHT46ami3fceoNhsWsbl/A89xvMjBAg2mW74QzuK1sKfJQBLulpEPbILi0g2xOKL6M0LJSDmIfQPMkJQ6tWzb33dUZw2efLZsamseiKOTlj5zP2Kz1zSEVzL9mgt16T8+werKw5sRMvJjyBZY0QXCbAG7mkmjJxgGRPgBgV11fGCNyUV+TJ7h2u0HKpEC5A+PeTw2ZNHzKZc8nGtpkMbnUIT5WjjWxbOj2kDuyTGDwt8ix1ZVT3PFE0JQ9C3Jz4TFPKdl+Sfj5rYQ7W+lSIVkBo1zJtiZzJTdssdfxlv drigocar@AC049707
 
 users:
   - name: "rodrigo"
@@ -18,7 +21,7 @@ write_files:
   - path: /etc/hosts
     content: |
          192.168.1.5     node1 node1.ellesmera.intranet
-         10.1.0.5        worker1  worker1 master.ellesmera.intranet
+         10.1.0.5        worker1  worker1.ellesmera.intranet
          192.168.1.6     node2 node2.ellesmera.intranet
          10.1.0.6        worker2 worker2.ellesmera.intranet
          192.168.1.7     node3 node3.ellesmera.intranet
@@ -31,7 +34,7 @@ write_files:
       nameserver 189.38.95.95
       nameserver 10.1.0.1
 
-  # cria diretorios
+  # Create directories structure
   - path: /opt/bin/create_dirs.sh
     owner: root
     permissions: 0755
@@ -46,53 +49,6 @@ write_files:
             mkdir -p /etc/kubernetes/cni/net.d/
             mkdir -p /etc/kubernetes/manifests/
 
-  # inicio configuracao kubelet
-  - path: /etc/systemd/system/kubelet.service
-    content: |
-        [Service]
-        ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
-
-        Environment=KUBELET_VERSION=${K8S_VER}
-        ExecStart=/usr/lib/coreos/kubelet-wrapper \
-          --api-servers=https://${MASTER_HOST} \
-          --network-plugin-dir=/etc/kubernetes/cni/net.d \
-          --network-plugin=${NETWORK_PLUGIN} \
-          --register-node=true \
-          --allow-privileged=true \
-          --config=/etc/kubernetes/manifests \
-          --hostname-override=${ADVERTISE_IP} \
-          --cluster-dns=${DNS_SERVICE_IP} \
-          --cluster-domain=cluster.local \
-          --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
-          --tls-cert-file=/etc/kubernetes/ssl/worker.pem \
-          --tls-private-key-file=/etc/kubernetes/ssl/worker-key.pem
-        Restart=always
-        RestartSec=10
-        [Install]
-        WantedBy=multi-user.target
-
-  # inicio configuracao calico cni
-  - path: /etc/kubernetes/cni/net.d/10-calico.conf
-    owner: root
-    content: |
-        {
-            "name": "calico",
-            "type": "flannel",
-            "delegate": {
-                "type": "calico",
-                "etcd_endpoints": "${ETCD_ENDPOINTS}",
-                "log_level": "none",
-                "log_level_stderr": "info",
-                "hostname": "${ADVERTISE_IP}",
-                "policy": {
-                    "type": "k8s",
-                    "k8s_api_root": "https://${MASTER_HOST}:443/api/v1/",
-                    "k8s_client_key": "/etc/kubernetes/ssl/worker-key.pem",
-                    "k8s_client_certificate": "/etc/kubernetes/ssl/worker.pem"
-                }
-            }
-        }
-
   - path: /etc/flannel/options.env
     owner: root
     content: |
@@ -101,113 +57,136 @@ write_files:
 
   - path: /etc/systemd/system/flanneld.service.d/40-ExecStartPre-symlink.conf
     content: |
-            [Service]
-            ExecStartPre=/usr/bin/ln -sf /etc/flannel/options.env /run/flannel/options.env
+      [Service]
+      ExecStartPre=/usr/bin/ln -sf /etc/flannel/options.env /run/flannel/options.env
 
   - path: /etc/systemd/system/docker.service.d/40-flannel.conf
     content: |
-            [Unit]
-            Requires=flanneld.service
-            After=flanneld.service
+      [Unit]
+      Requires=flanneld.service
+      After=flanneld.service
+      [Service]
+      EnvironmentFile=/etc/kubernetes/cni/docker_opts_cni.env
 
-# inicio configuracao proxy
+  - path: /etc/kubernetes/cni/docker_opts_cni.env
+    owner: root
+    content: |
+      DOCKER_OPT_BIP=""
+      DOCKER_OPT_IPMASQ=""
+
+  - path: /etc/kubernetes/cni/net.d/10-flannel.conf
+    owner: root
+    content: |
+      {
+          "name": "podnet",
+          "type": "flannel",
+          "delegate": {
+              "isDefaultGateway": true
+          }
+      }
+
+  # Set up Kubelet service
+  - path: /etc/systemd/system/kubelet.service
+    content: |
+      [Service]
+      Environment=KUBELET_IMAGE_TAG=${K8S_VER}
+      Environment="RKT_RUN_ARGS=--uuid-file-save=/var/run/kubelet-pod.uuid \
+        --volume dns,kind=host,source=/etc/resolv.conf \
+        --mount volume=dns,target=/etc/resolv.conf \
+        --volume var-log,kind=host,source=/var/log \
+        --mount volume=var-log,target=/var/log \
+        --volume cni-bin,kind=host,source=/opt/cni/bin \
+        --mount volume=cni-bin,target=/opt/cni/bin"
+      ExecStartPre=/usr/bin/mkdir -p /opt/cni/bin
+      ExecStartPre=/usr/bin/mkdir -p /etc/kubernetes/manifests
+      ExecStartPre=/usr/bin/mkdir -p /var/log/containers
+      ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/kubelet-pod.uuid
+      ExecStart=/usr/lib/coreos/kubelet-wrapper \
+        --api-servers=https://${MASTER_HOST} \
+        --cni-conf-dir=/etc/kubernetes/cni/net.d \
+        --network-plugin=${NETWORK_PLUGIN} \
+        --container-runtime=docker \
+        --register-node=true \
+        --allow-privileged=true \
+        --pod-manifest-path=/etc/kubernetes/manifests \
+        --hostname-override=${ADVERTISE_IP} \
+        --cluster_dns=${DNS_SERVICE_IP} \
+        --cluster_domain=cluster.local \
+        --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml \
+        --tls-cert-file=/etc/kubernetes/ssl/worker.pem \
+        --tls-private-key-file=/etc/kubernetes/ssl/worker-key.pem
+      ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid
+      Restart=always
+      RestartSec=10
+
+      [Install]
+      WantedBy=multi-user.target
+
+  # Set up Kube-Proxy
   - path: /etc/kubernetes/manifests/kube-proxy.yaml
     owner: root
     content: |
-        apiVersion: v1
-        kind: Pod
-        metadata:
-          name: kube-proxy
-          namespace: kube-system
-        spec:
-          hostNetwork: true
-          containers:
-          - name: kube-proxy
-            image: quay.io/coreos/hyperkube:v1.4.6_coreos.0
-            command:
-            - /hyperkube
-            - proxy
-            - --master=https://${MASTER_HOST}
-            - --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml
-            - --proxy-mode=iptables
-            securityContext:
-              privileged: true
-            volumeMounts:
-              - mountPath: /etc/ssl/certs
-                name: "ssl-certs"
-              - mountPath: /etc/kubernetes/worker-kubeconfig.yaml
-                name: "kubeconfig"
-                readOnly: true
-              - mountPath: /etc/kubernetes/ssl
-                name: "etc-kube-ssl"
-                readOnly: true
-          volumes:
-            - name: "ssl-certs"
-              hostPath:
-                path: "/usr/share/ca-certificates"
-            - name: "kubeconfig"
-              hostPath:
-                path: "/etc/kubernetes/worker-kubeconfig.yaml"
-            - name: "etc-kube-ssl"
-              hostPath:
-                path: "/etc/kubernetes/ssl"
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: kube-proxy
+        namespace: kube-system
+      spec:
+        hostNetwork: true
+        containers:
+        - name: kube-proxy
+          image: quay.io/coreos/hyperkube:${K8S_VER}
+          command:
+          - /hyperkube
+          - proxy
+          - --master=${MASTER_HOST}
+          - --kubeconfig=/etc/kubernetes/worker-kubeconfig.yaml
+          securityContext:
+            privileged: true
+          volumeMounts:
+          - mountPath: /etc/ssl/certs
+            name: "ssl-certs"
+          - mountPath: /etc/kubernetes/worker-kubeconfig.yaml
+            name: "kubeconfig"
+            readOnly: true
+          - mountPath: /etc/kubernetes/ssl
+            name: "etc-kube-ssl"
+            readOnly: true
+        volumes:
+        - name: "ssl-certs"
+          hostPath:
+            path: "/usr/share/ca-certificates"
+        - name: "kubeconfig"
+          hostPath:
+            path: "/etc/kubernetes/worker-kubeconfig.yaml"
+        - name: "etc-kube-ssl"
+          hostPath:
+            path: "/etc/kubernetes/ssl"
 
-# inicio configuracao worker
   - path: /etc/kubernetes/worker-kubeconfig.yaml
     owner: root
     content: |
-        apiVersion: v1
-        kind: Config
-        clusters:
-        - name: local
-          cluster:
-            certificate-authority: /etc/kubernetes/ssl/ca.pem
-        users:
-        - name: kubelet
-          user:
-            client-certificate: /etc/kubernetes/ssl/worker.pem
-            client-key: /etc/kubernetes/ssl/worker-key.pem
-        contexts:
-        - context:
-            cluster: local
-            user: kubelet
-          name: kubelet-context
-        current-context: kubelet-context
+      apiVersion: v1
+      kind: Config
+      clusters:
+      - name: local
+        cluster:
+          certificate-authority: /etc/kubernetes/ssl/ca.pem
+      users:
+      - name: kubelet
+        user:
+          client-certificate: /etc/kubernetes/ssl/worker.pem
+          client-key: /etc/kubernetes/ssl/worker-key.pem
+      contexts:
+      - context:
+          cluster: local
+          user: kubelet
+        name: kubelet-context
+      current-context: kubelet-context
 
-# inicio configuracao calico
-  - path: /etc/systemd/system/calico-node.service
-    owner: root
-    content: |
-        [Unit]
-        Description=Calico node for network policy
-        Requires=network-online.target
-        After=network-online.target
-
-        [Service]
-        Slice=machine.slice
-        Environment=CALICO_DISABLE_FILE_LOGGING=true
-        Environment=HOSTNAME=${ADVERTISE_IP}
-        Environment=IP=${ADVERTISE_IP}
-        Environment=FELIX_FELIXHOSTNAME=${ADVERTISE_IP}
-        Environment=CALICO_NETWORKING=false
-        Environment=NO_DEFAULT_POOLS=true
-        Environment=ETCD_ENDPOINTS=${ETCD_ENDPOINTS}
-        ExecStart=/usr/bin/rkt run --inherit-env --stage1-from-dir=stage1-fly.aci \
-        --volume=modules,kind=host,source=/lib/modules,readOnly=false \
-        --mount=volume=modules,target=/lib/modules \
-        --trust-keys-from-https quay.io/calico/node:v0.19.0
-        KillMode=mixed
-        Restart=always
-        TimeoutStartSec=0
-
-        [Install]
-        WantedBy=multi-user.target
-
-  # inicio Script automation
-
+  # Install kubelet and kubectl binaries
   - path: /opt/bin/kubernetes-install.sh
     owner: root
-    permissions: 0755
     content: |
       #! /usr/bin/bash
 
@@ -215,14 +194,13 @@ write_files:
         echo "Kubenetes not installed - installing."
 
         # Extract the Kubernetes binaries.
-        sudo wget -N -P /opt/bin http://storage.googleapis.com/kubernetes-release/release/v1.4.6/bin/linux/amd64/kubectl
-        sudo wget -N -P /opt/bin http://storage.googleapis.com/kubernetes-release/release/v1.4.6/bin/linux/amd64/kubelet
-        sudo chmod +x /opt/bin/kubelet /opt/bin/kubectl
+        wget -N -P /opt/bin http://storage.googleapis.com/kubernetes-release/release/v1.6.1/bin/linux/amd64/kubectl
+        wget -N -P /opt/bin http://storage.googleapis.com/kubernetes-release/release/v1.6.1/bin/linux/amd64/kubelet
+        chmod +x /opt/bin/kubelet /opt/bin/kubectl
       fi
 
   - path: /opt/bin/calico-install.sh
     owner: root
-    permissions: 0755
     content: |
       #! /usr/bin/bash
 
@@ -230,9 +208,9 @@ write_files:
         echo "Calico not installed - installing."
 
         # Install the `calicoctl` binary
-        wget https://github.com/projectcalico/calico-containers/releases/download/v0.14.0/calicoctl
+        wget https://github.com/projectcalico/calicoctl/releases/download/v1.0.2/calicoctl
         chmod +x calicoctl
-        sudo mv calicoctl /opt/bin
+        mv calicoctl /opt/bin
 
         # Fetch the calico/node container
         sudo docker pull calico/node:v0.14.0
@@ -240,7 +218,6 @@ write_files:
 
   - path: /etc/kubernetes/ssl/kubeconfig.sh
     owner: root
-    permissions: 0755
     content: |
         #!/usr/bin/bash
 
@@ -250,6 +227,22 @@ write_files:
         # Script configuracao Kubernetes
         ###################################
 
+        function main()
+        {
+          echo "Begin Setup"
+          echo 'core:core' | chpasswd
+
+          ADV_IP=192.168.1.5
+          MASTER=192.168.1.20
+          ETCD_END=http://10.1.0.5:2379,http://10.1.0.6:2379,http://10.1.0.7:2379
+          K8S=v1.6.1_coreos.0
+          NETWORK=
+          SERVICE_IP=10.3.0.0/24
+          DNS_SERVICE=10.3.0.10
+
+          create_dirs
+
+        }
         function create_dirs()
         {
 
@@ -263,14 +256,6 @@ write_files:
         function kubernetes_setup()
         {
 
-          ADV_IP=192.168.1.5
-          MASTER=192.168.1.20
-          ETCD_END=http://10.1.0.5:2379,http://10.1.0.6:2379,http://10.1.0.20:2379
-          K8S=v1.4.6_coreos.0
-          NETWORK=""
-          SERVICE_IP=10.3.0.0/24
-          DNS_SERVICE=10.3.0.10
-
           echo "Flannel Network Configuration ..."
           eval sed -i -e 's#\\\${ADVERTISE_IP}#"$ADV_IP"#g' /etc/flannel/options.env
           eval sed -i -e 's#\\\${ETCD_ENDPOINTS}#"$ETCD_END"#g' /etc/flannel/options.env
@@ -282,17 +267,9 @@ write_files:
           eval sed -i -e 's#\\\${K8S_VER}#"$K8S"#g' /etc/systemd/system/kubelet.service
           eval sed -i -e 's#\\\${NETWORK_PLUGIN}#"$NETWORK"#g' /etc/systemd/system/kubelet.service
 
-          eval sed -i -e 's#\\\${ADVERTISE_IP}#"${ADV_IP}"#g' /etc/kubernetes/cni/net.d/10-calico.conf
-          eval sed -i -e 's#\\\${ETCD_ENDPOINTS}#"${ETCD_END}"#g' /etc/kubernetes/cni/net.d/10-calico.conf
-          eval sed -i -e 's#\\\${MASTER_HOST}#"${MASTER}"#g' /etc/kubernetes/cni/net.d/10-calico.conf
-
-          echo "Set Up the kube-apiserver Pod ..."
+          echo "Configure Kubelet proxy"
           eval sed -i -e 's#\\\${MASTER_HOST}#"$MASTER"#g' /etc/kubernetes/manifests/kube-proxy.yaml
-
-          echo "Set Up Calico Node Container (optional) ..."
-          eval sed -i -e 's#\\\${ADVERTISE_IP}#"${ADV_IP}"#g' /etc/systemd/system/calico-node.service
-          eval sed -i -e 's#\\\${ETCD_ENDPOINTS}#"${ETCD_END}"#g' /etc/systemd/system/calico-node.service
-          eval sed -i -e 's#\\\${MASTER_HOST}#"${MASTER}"#g' /etc/systemd/system/calico-node.service
+          eval sed -i -e 's#\\\${K8S_VER}#"$K8S"#g' /etc/kubernetes/manifests/kube-proxy.yaml
 
           install_kubernets
 
@@ -319,42 +296,40 @@ write_files:
 
           echo "Saving settings ..."
           eval systemctl daemon-reload
-          echo "core:05digo10" | chpasswd
 
           echo "Starting services ...";
 
         }
 
         ############### Start Script ####################
-
-        echo "Kubernetes set up start...";
-        echo "";
-        create_dirs
+        main
 
 coreos:
+  update:
+      reboot-strategy: off
 
   units:
     - name: static.network
       content: |
         [Match]
-        Name=enp0s3
+        Name=eth0
         [Network]
         Address=10.1.0.5/24
-        Gateway=10.1.0.1
 
     - name: 11-static.network
       content: |
         [Match]
-        Name=enp0s8
+        Name=eth1
         [Network]
         Address=10.2.0.5/24
 
     - name: 13-static.network
       content: |
         [Match]
-        Name=enp0s9
+        Name=eth2
         [Network]
         Address=192.168.1.5/24
+        Gateway=192.168.1.1
 
     - name: cpu-governor.service
       command: start
@@ -372,20 +347,32 @@ coreos:
       command: start
       enable: true
 
+    - name: flanneld.service
+      drop-ins:
+      - name: 50-network-config.conf
+        content: |
+          [Service]
+          ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.0.1.0/16", "Backend": {"Type": "vxlan"}}'
+      command: start
+
     - name: kubeconfig.service
       command: start
       enable: true
       content: |
         [Unit]
-        Description=Enable Kubeconfig Service
-        After=systemd-networkd.service
-        Requires=systemd-networkd.service
+        Description=Kubernetes Config Service
 
         [Service]
-        Type=oneshot
-        ExecStart=/etc/kubernetes/ssl/kubeconfig.sh
-        ExecReload=/etc/kubernetes/ssl/kubeconfig.sh
+        Type=forking
+        WorkingDirectory=/etc/kubernetes/ssl/
+        ExecStartPre=/bin/bash kubeconfig.sh 
+        ExecStart=/bin/bash kubeconfig.sh 
+        ExecReload=/bin/bash kubeconfig.sh 
+        KillMode=process
         RemainAfterExit=yes
+
+        [Install]
+        WantedBy=multi-user.target
 
     - name: etcd2.service
       command: start
@@ -395,13 +382,9 @@ coreos:
       command: start
       enable: true
 
-    - name: flanneld.service
-      drop-ins:
-      - name: 50-network-config.conf
-        content: |
-          [Service]
-          ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.0.1.0/16", "Backend": {"Type": "vxlan"}}'
+    - name: kubeconfig.service
       command: start
+      enable: true
 
   etcd2:
      name: worker1
@@ -409,6 +392,6 @@ coreos:
      listen-peer-urls: http://10.1.0.5:2380
      listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
      advertise-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
-     initial-cluster-token: cluster-ellesmera
-     initial-cluster: worker1=http://10.1.0.5:2380,worker2=http://10.1.0.6:2380,master1=http://10.1.0.20:2380
+     initial-cluster-token: cluster-worker
+     initial-cluster: worker1=http://10.1.0.5:2380,worker2=http://10.1.0.6:2380,worker3=http://10.1.0.7:2380
      initial-cluster-state: new
