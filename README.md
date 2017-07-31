@@ -27,7 +27,7 @@ After define your networking information like "IP Address and Hostnames", replac
 
 ## Installing Kubernetes Master
 
-##### Step 1: Set up your hostname
+##### Step 1: Setup your hostname
 
 ```
 hostname: "kubemaster"
@@ -104,7 +104,7 @@ ssh_authorized_keys:
   DNS_SERVICE=10.3.0.10
 ```
 
-## Set up your Etcd2 Cluster (please respect your cluster size defined previously)
+## Setup your Etcd2 Cluster (please respect your cluster size defined previously)
 
 ```
   etcd2:

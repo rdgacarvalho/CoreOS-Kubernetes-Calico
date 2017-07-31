@@ -35,7 +35,6 @@ write_files:
       content: |
         search ellesmera
         nameserver 192.168.1.1
-        nameserver 189.38.95.95
 
     # create directories structure
     - path: /opt/bin/create_dirs
@@ -312,7 +311,7 @@ write_files:
 
         }
 
-        function setup_kubectl()
+        function setupkube()
         {
 
           sh /opt/bin/kubernetes-install.sh

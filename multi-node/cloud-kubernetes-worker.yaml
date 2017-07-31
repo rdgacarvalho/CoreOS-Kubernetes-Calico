@@ -31,8 +31,7 @@ write_files:
 
   - path: /etc/resolv.conf
     content: |
-      nameserver 189.38.95.95
-      nameserver 10.1.0.1
+      nameserver 192.168.1.1
 
   # Create directories structure
   - path: /opt/bin/create_dirs.sh
