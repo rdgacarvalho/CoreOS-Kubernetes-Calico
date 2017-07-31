@@ -80,6 +80,12 @@ Access your kubemaster server via ssh client and execute the follow command:
 core@localhost# cd /etc/kubernetes/ssl/ ; sudo bash kubeconfig.sh setupkube
 ```
 
+#### Step 7: Check your environment
+
+```
+core@localhost# sudo systemctl status etcd2 kubelet
+```
+
 ## Installing Kubernetes Workers Nodes
 
 ##### Step 1: Set up your hostname
@@ -101,7 +107,7 @@ ssh_authorized_keys:
 
 > Repeat this step for each worker node of your CoreOS cluster. Remember to replace the "hostname" and "ip address" into cloud-kubernetes-worker.yml file before start the installation process.
 
-## Defining your Etcd2 Cluster
+#### Defining your Etcd2 Cluster
 ```
   ADV_IP=192.168.1.5
   MASTER=192.168.1.20 
@@ -112,7 +118,7 @@ ssh_authorized_keys:
   DNS_SERVICE=10.3.0.10
 ```
 
-## Step 4: Setup your Etcd2 Cluster (please respect your cluster size defined previously)
+#### Step 4: Setup your Etcd2 Cluster (please respect your cluster size defined previously)
 
 ```
   etcd2:
@@ -126,7 +132,7 @@ ssh_authorized_keys:
      initial-cluster-state: new
 ```
 
-## Step 5: Installing your Workers Node
+#### Step 5: Installing your Workers Node
 
 ```
 coreos@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-worker.yaml
@@ -138,6 +144,12 @@ Access your kubemaster server via ssh client and execute the follow command:
 
 ```
 core@localhost# cd /etc/kubernetes/ssl/ ; sudo bash kubeconfig.sh main
+```
+
+#### Step 7: Check your environment
+
+```
+core@localhost# sudo systemctl status etcd2 kubelet
 ```
 
 ## Author
