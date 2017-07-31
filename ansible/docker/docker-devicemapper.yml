@@ -1,9 +1,0 @@
----
-
-- name: Configure Docker to use Devicemapper
-  hosts: all
-  remote_user: root
-  connection: ssh
-  
-  roles:
-    - devicemapper

@@ -52,7 +52,7 @@ MASTER_IP=("192.168.1.20")
 K8S_SERVICE_IP=10.3.0.1
 ```
 
-###### Step 3: Replace for your IP address to configure your etcd2 cluster
+###### Step 4: Replace for your IP address to configure your etcd2 cluster
 
 ```
 etcd2:
@@ -66,10 +66,18 @@ etcd2:
      initial-cluster-state: new
 ```
 
-##### Step 4: Installing CoreOS Kubermaster
+##### Step 5: Installing CoreOS Kubermaster
 
 ```
 core@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-master.yaml
+```
+
+##### Step 6: Install and Configure Kubernetes Components
+
+Access your kubemaster server via ssh client and execute the follow command:
+
+```
+core@localhost# cd /etc/kubernetes/ssl/ ; sudo bash kubeconfig.sh setupkube
 ```
 
 ## Installing Kubernetes Workers Nodes
@@ -104,7 +112,7 @@ ssh_authorized_keys:
   DNS_SERVICE=10.3.0.10
 ```
 
-## Setup your Etcd2 Cluster (please respect your cluster size defined previously)
+## Step 4: Setup your Etcd2 Cluster (please respect your cluster size defined previously)
 
 ```
   etcd2:
@@ -118,10 +126,18 @@ ssh_authorized_keys:
      initial-cluster-state: new
 ```
 
-## Installing your Workers Node
+## Step 5: Installing your Workers Node
 
 ```
 coreos@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-worker.yaml
+```
+
+##### Step 6: Install and Configure Kubernetes Components
+
+Access your kubemaster server via ssh client and execute the follow command:
+
+```
+core@localhost# cd /etc/kubernetes/ssl/ ; sudo bash kubeconfig.sh main
 ```
 
 ## Author
