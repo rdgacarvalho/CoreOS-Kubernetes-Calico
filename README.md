@@ -52,7 +52,7 @@ MASTER_IP=("192.168.1.20")
 K8S_SERVICE_IP=10.3.0.1
 ```
 
-###### Step 4: Replace for your IP address to configure your etcd2 cluster
+##### Step 4: Replace for your IP address to configure your etcd2 cluster
 
 ```
 etcd2:
