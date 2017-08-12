@@ -7,7 +7,7 @@ ssh_authorized_keys:
   - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIjWNEUigHQV8Hjnb64XhrG6xApRNPhgxh1pUj3zrS0v5CsHT46ami3fceoNhsWsbl/A89xvMjBAg2mW74QzuK1sKfJQBLulpEPbILi0g2xOKL6M0LJSDmIfQPMkJQ6tWzb33dUZw2efLZsamseiKOTlj5zP2Kz1zSEVzL9mgt16T8+werKw5sRMvJjyBZY0QXCbAG7mkmjJxgGRPgBgV11fGCNyUV+TJ7h2u0HKpEC5A+PeTw2ZNHzKZc8nGtpkMbnUIT5WjjWxbOj2kDuyTGDwt8ix1ZVT3PFE0JQ9C3Jz4TFPKdl+Sfj5rYQ7W+lSIVkBo1zJtiZzJTdssdfxlv drigocar@AC049707
 
 users:
-  - name: "rodrigo"
+  - name: "sysadm"
     passwd: "$1$ZTRJ37/b$CszXZYtjXgXp7ieUlSNZ51"
     groups:
       - "sudo"
