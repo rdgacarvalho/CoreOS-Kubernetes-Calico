@@ -220,7 +220,7 @@ write_files:
     content: |
         #!/usr/bin/bash
 
-        set -x
+        #set -x
 
         ###################################
         # Script configuracao Kubernetes
