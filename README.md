@@ -19,13 +19,13 @@ Kubernetes is an open-source system for automating deployment, scaling, and mana
 * [Storage orchestration]
 * [Batch execution]
 
-# Install CoreOS Linux Container (from strach)
+# Install CoreOS Linux Container Static Cluster or Discovery Cluster
 
-After define your networking information like "IP Address and Hostnames", replace the variables inside cloud-kubernetes-master.yaml and kubeconfig.sh file as show below.
+After define your networking information like "IP Address and Hostnames", replace the variables inside kubemaster.yaml.
 
-## Pay attention: All changes should be made into cloud-kubernetes-master.yaml file
+## Pay attention: All changes should be made into static_cluster/ files
 
-## Installing Kubernetes Master
+## Installing Kubernetes Master - Static Cluster
 
 ##### Step 1: Setup your hostname
 
@@ -46,7 +46,7 @@ MASTER_IP=192.168.1.20
 K8S_IP=10.3.0.1
 # kubernetes workers setup
 WORKER_NUMBER=1
-WORKERS_FQDN=("worker1.ellesmera.intranet" "worker2.ellesmera.intranet" "worker3.ellesmera.intranet")
+WORKERS_FQDN=("worker1.ellesmera.com" "worker2.ellesmera.com" "worker3.ellesmera.com")
 WORKERS_IP=("192.168.1.5" "192.168.1.6" "192.168.1.7")
 MASTER_IP=("192.168.1.20")
 K8S_SERVICE_IP=10.3.0.1
@@ -69,24 +69,38 @@ etcd2:
 ##### Step 5: Installing CoreOS Kubermaster
 
 ```
-core@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-master.yaml
+core@localhost# coreos-install -d /dev/sda -c kubemaster.yaml
 ```
 
 ##### Step 6: Install and Configure Kubernetes Components
 
-Access your kubemaster server via ssh client and execute the follow command:
+Access your kubemaster server using a ssh client and execute the following command:
 
 ```
 core@localhost# cd /etc/kubernetes/ssl/ ; sudo bash kubeconfig.sh setupkube
 ```
 
-#### Step 7: Check your environment
+#### Step 7: Starting Services
 
 ```
-core@localhost# sudo systemctl status etcd2 kubelet
+core@localhost# sudo systemctl restart etcd2 kubelet
 ```
 
-## Installing Kubernetes Workers Nodes
+#### Step 8: Checking Services
+
+```
+core@localhost# systemctl status etcd2 kubelet
+```
+
+#### Step 9: Checking Kubernetes Cluster
+
+```
+core@localhost# kubectl get nodes
+```
+
+## Installing Kubernetes Workers Nodes - Static Cluster
+
+## Pay attention: All changes should be made into static_cluster/ files
 
 ##### Step 1: Set up your hostname
 
@@ -105,7 +119,7 @@ ssh_authorized_keys:
 
 ## Installing Kubernetes Workers
 
-> Repeat this step for each worker node of your CoreOS cluster. Remember to replace the "hostname" and "ip address" into cloud-kubernetes-worker.yml file before start the installation process.
+> Repeat these steps for each worker node of your CoreOS cluster. Remember to replace the "hostname" and "ip address" into workers.yml file before start the installation process.
 
 #### Defining your Etcd2 Cluster
 ```
@@ -113,7 +127,7 @@ ssh_authorized_keys:
   MASTER=192.168.1.20 
   ETCD_END=http://10.1.0.5:2379,http://10.1.0.6:2379,http://10.1.0.7:2379
   K8S=v1.6.1_coreos.0
-  NETWORK=
+  NETWORK=""
   SERVICE_IP=10.3.0.0/24
   DNS_SERVICE=10.3.0.10
 ```
@@ -135,7 +149,7 @@ ssh_authorized_keys:
 #### Step 5: Installing your Workers Node
 
 ```
-coreos@localhost# coreos-install -d /dev/sda -c cloud-kubernetes-worker.yaml
+coreos@localhost# coreos-install -d /dev/sda -c workers.yaml
 ```
 
 ##### Step 6: Install and Configure Kubernetes Components
@@ -149,7 +163,12 @@ core@localhost# cd /etc/kubernetes/ssl/ ; sudo bash kubeconfig.sh main
 #### Step 7: Check your environment
 
 ```
-core@localhost# sudo systemctl status etcd2 kubelet
+core@localhost# sudo systemctl restart etcd2 kubelet
+```
+#### Step 8: Checking Services
+
+```
+core@localhost# systemctl status etcd2 kubelet
 ```
 
 ## Author
