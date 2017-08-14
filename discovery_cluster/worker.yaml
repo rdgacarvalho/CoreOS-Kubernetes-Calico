@@ -231,7 +231,7 @@ write_files:
           echo "Begin Setup"
           echo 'core:core' | chpasswd
 
-          ADV_IP=192.168.1.5
+          ADV_IP=192.168.1.%IP%
           MASTER=192.168.1.20
           ETCD_END=http://10.1.0.5:2379,http://10.1.0.6:2379,http://10.1.0.7:2379
           K8S=v1.6.1_coreos.0
@@ -363,7 +363,7 @@ coreos:
         [Service]
         Type=forking
         WorkingDirectory=/etc/kubernetes/ssl/
-        ExecStartPre=/bin/bash kubeconfig.sh 
+        ExecStartPre=/bin/bash kubeconfig.sh main
         ExecStart=/bin/bash kubeconfig.sh main
         ExecReload=/bin/bash kubeconfig.sh main
         KillMode=process
