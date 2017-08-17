@@ -307,6 +307,24 @@ coreos:
       reboot-strategy: off
 
   units:
+    - name: kubeconfig.service
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Execute Kubeconfig Service
+        After=systemd-networkd.service
+        Requires=systemd-networkd.service
+
+        [Service]
+        Type=forking
+        WorkingDirectory=/etc/kubernetes/ssl/
+        ExecStartPre=/bin/bash kubeconfig.sh
+        ExecStart=/bin/bash kubeconfig.sh main
+        ExecReload=/bin/bash kubeconfig.sh main
+        KillMode=process
+        RemainAfterExit=yes
+
     - name: static.network
       content: |
         [Match]
@@ -345,14 +363,6 @@ coreos:
       command: start
       enable: true
 
-    - name: flanneld.service
-      command: start
-      drop-ins:
-      - name: 50-network-config.conf
-        content: |
-          [Service]
-          ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.0.1.0/16", "Backend": {"Type": "vxlan"}}'
-
     - name: etcd2.service
       command: restart
       enable: true
@@ -369,23 +379,13 @@ coreos:
       command: restart
       enable: true
 
-    - name: kubeconfig.service
+    - name: flanneld.service
       command: start
-      enable: true
-      content: |
-        [Unit]
-        Description=Execute Kubeconfig Service
-        After=systemd-networkd.service
-        Requires=systemd-networkd.service
-
-        [Service]
-        Type=forking
-        WorkingDirectory=/etc/kubernetes/ssl/
-        ExecStartPre=/bin/bash kubeconfig.sh main
-        ExecStart=/bin/bash kubeconfig.sh main
-        ExecReload=/bin/bash kubeconfig.sh main
-        KillMode=process
-        RemainAfterExit=yes
+      drop-ins:
+      - name: 50-network-config.conf
+        content: |
+          [Service]
+          ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{"Network":"10.0.1.0/16", "Backend": {"Type": "vxlan"}}'
 
   etcd2:
     name: %HOSTNAME%

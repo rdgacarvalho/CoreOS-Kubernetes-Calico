@@ -60,7 +60,7 @@ fi
 
 for SEQ in $(seq 1 $1); do
         COREOS_HOSTNAME="$2$SEQ"
-        IP_ADDR=`seq 2 "$3"`
+        IP=`expr 1 + $SEQ`
 
         if [ ! -d $LIBVIRT_PATH/$COREOS_HOSTNAME/openstack/latest ]; then
                 echo "Creating Deploy Path ..."
