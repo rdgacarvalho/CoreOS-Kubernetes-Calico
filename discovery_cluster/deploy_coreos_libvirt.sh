@@ -3,29 +3,21 @@
 #set -x
 
 usage() {
-        echo "Usage: $0 number_of_coreos_nodes $1 kubemaster/worker $3 end_ip_address"
-        echo "Example: 3 worker 2"
+        echo "Usage: $0 number_of_coreos_nodes $2 kubemaster/worker $3 end_ip_address"
+        echo "Example: 3 worker"
 }
 
-if [ "$1" == "" -a "$2" == "" -a "$3" == "" ]; then
+if [ "$1" == "" -a "$2" == "" ]; then
         usage
         exit 1
 fi
 
 if ! [[ $1 =~ ^[0-9]+$ ]]; then
-        echo "'$1' is not a number"
-        usage
-        exit 1
-fi
-
-if [ $2 != "kubemaster"  ||  $2 != "worker" ]; then
-        echo "'$2' kubemaster/worker"
         usage
         exit 2
 fi
 
-if [ $3 <= "1" ]; then
-        echo "'$3' IP Address starts in 2"
+if [ "$2" == "" ]; then
         usage
         exit 3
 fi
@@ -43,6 +35,7 @@ RAM=1024
 CPUs=1
 IMG_NAME="coreos_${CHANNEL}_${RELEASE}_qemu_image.img"
 IMG_DISK="coreos_production_qemu_image.img"
+IPSTART="2"
 
 if [ ! -d /opt/$GITPROJECT ]; then
         echo "Clone CoreOS Project from GitHUB ..."
@@ -55,13 +48,20 @@ fi
 
 if [ ! -f /opt/$GITPROJECT/$CLUSTERTYPE/$2.yaml ]; then
         echo "$USER_DATA_TEMPLATE template doesn't exist"
-        exit 1
+        exit 4
 fi
 
-for SEQ in $(seq 1 $1); do
+for SEQ in $(seq 1 $1);  do
         COREOS_HOSTNAME="$2$SEQ"
-        IP=`expr 1 + $SEQ`
+        IPRANGE="0"
+        IP="$3"
 
+        if [ $IPADD -ne $1 ]; then
+                IPADD=`expr $IPADD + 1`
+        else
+                IPADD="$3"
+        fi
+        
         if [ ! -d $LIBVIRT_PATH/$COREOS_HOSTNAME/openstack/latest ]; then
                 echo "Creating Deploy Path ..."
                 mkdir -p $LIBVIRT_PATH/$COREOS_HOSTNAME/openstack/latest || (echo "Can not create $LIBVIRT_PATH/$COREOS_HOSTNAME/openstack/latest directory" && exit 1)
@@ -78,21 +78,22 @@ for SEQ in $(seq 1 $1); do
         fi
 
         cp /opt/$GITPROJECT/$CLUSTERTYPE/$2.yaml $LIBVIRT_PATH/$COREOS_HOSTNAME/openstack/latest/user_data
-        sed "s#%HOSTNAME%#$COREOS_HOSTNAME#g;s#%DISCOVERY%#$ETCD_DISCOVERY#g;s#%IP_ADDR%#$IP#g" $USER_DATA_TEMPLATE > $LIBVIRT_PATH/$COREOS_HOSTNAME/openstack/latest/user_data
+        sed "s#%HOSTNAME%#$COREOS_HOSTNAME#g;s#%DISCOVERY%#$ETCD_DISCOVERY#g;s#%IP_ADDR%#$IPADD#g" $USER_DATA_TEMPLATE > $LIBVIRT_PATH/$COREOS_HOSTNAME/openstack/latest/user_data
         sleep 2
 
         virt-install --connect qemu:///system \
-                     --import \
-                     --name $COREOS_HOSTNAME \
-                     --ram $RAM \
-                     --vcpus $CPUs \
-                     --os-type=linux \
-                     --os-variant=virtio26 \
-                     --disk path=$LIBVIRT_PATH/$COREOS_HOSTNAME.qcow2,format=qcow2,bus=virtio \
-                     --filesystem $LIBVIRT_PATH/$COREOS_HOSTNAME/,config-2,type=mount,mode=squash \
-                     --network bridge=virbr0 \
-                     --network bridge=virbr1 \
-                     --network bridge=virbr2 \
-                     --vnc \
-                     --noautoconsole
-done
+                --import \
+                --name $COREOS_HOSTNAME \
+                --ram $RAM \
+                --vcpus $CPUs \
+                --os-type=linux \
+                --os-variant=virtio26 \
+                --disk path=$LIBVIRT_PATH/$COREOS_HOSTNAME.qcow2,format=qcow2,bus=virtio \
+                --filesystem $LIBVIRT_PATH/$COREOS_HOSTNAME/,config-2,type=mount,mode=squash \
+                --network bridge=virbr0 \
+                --network bridge=virbr1 \
+                --network bridge=virbr2 \
+                --vnc \
+                --noautoconsole
+
+done            
