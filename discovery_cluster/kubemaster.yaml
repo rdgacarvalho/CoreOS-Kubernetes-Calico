@@ -155,7 +155,7 @@ write_files:
           CA_CERT=/etc/kubernetes/ssl/ca.pem
           ADMIN_KEY=/etc/kubernetes/ssl/admin-key.pem
           ADMIN_CERT=/etc/kubernetes/ssl/admin.pem
-          MASTER_HOST=192.168.1.%IP_ADDR%
+          MASTER_HOST=192.168.1.20
 
           create_ca
 
