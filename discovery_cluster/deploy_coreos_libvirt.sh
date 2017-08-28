@@ -4,7 +4,7 @@
 
 usage() {
         echo "Usage: $0 number_of_coreos_nodes $2 kubemaster/worker $3 end_ip_address"
-        echo "Example: 3 worker"
+        echo "Example: 3 worker 100"
 }
 
 if [ "$1" == "" -a "$2" == "" ]; then
@@ -49,6 +49,13 @@ fi
 if [ ! -f /opt/$GITPROJECT/$CLUSTERTYPE/$2.yaml ]; then
         echo "$USER_DATA_TEMPLATE template doesn't exist"
         exit 4
+elif [ $2 == "worker" ]; then
+        echo $1 > $PWD/workers_size.txt
+        
+elif [ $2 == "kubemaster" ]; then
+        CLUSTERSIZE=$(head workers_size.txt)
+else
+        echo "Error: $(exit 5)";
 fi
 
 for SEQ in $(seq 1 $1);  do
@@ -78,7 +85,7 @@ for SEQ in $(seq 1 $1);  do
         fi
 
         cp /opt/$GITPROJECT/$CLUSTERTYPE/$2.yaml $LIBVIRT_PATH/$COREOS_HOSTNAME/openstack/latest/user_data
-        sed "s#%HOSTNAME%#$COREOS_HOSTNAME#g;s#%DISCOVERY%#$ETCD_DISCOVERY#g;s#%IP_ADDR%#$IPADD#g" $USER_DATA_TEMPLATE > $LIBVIRT_PATH/$COREOS_HOSTNAME/openstack/latest/user_data
+        sed "s#%HOSTNAME%#$COREOS_HOSTNAME#g;s#%DISCOVERY%#$ETCD_DISCOVERY#g;s#%IP_ADDR%#$IPADD#g;s#%SIZE%#$CLUSTERSIZE#g" $USER_DATA_TEMPLATE > $LIBVIRT_PATH/$COREOS_HOSTNAME/openstack/latest/user_data
         sleep 2
 
         virt-install --connect qemu:///system \
@@ -95,5 +102,4 @@ for SEQ in $(seq 1 $1);  do
                 --network bridge=virbr2 \
                 --vnc \
                 --noautoconsole
-
 done            

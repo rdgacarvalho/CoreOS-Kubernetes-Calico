@@ -3,8 +3,7 @@
 hostname: %HOSTNAME%
 
 ssh_authorized_keys:
-  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCWM7xMnzcy1hTjxoV7/Cc8lSeoWhUUPsoNbFSkL9wiLq++SqscipEeA3HRYlI7X9VJbhCWRYAA5AKj7hGMZ60sByzvo8nSJVN54zcOfH5wnJKdO3FJeQfYkyqYsBpC8Kg0+dILtvhxgf5KenFQkPnb8DXmNExvm/jzJgu2YbOSmKcSvt9zQnHTj7AAILC8GozYonJEzE5Yo8JiKUbVSBq9lL54dbi/47QhfhIjKbK7n4+tbsU/aLPKauv+NW2jj69tIycg6WnoarSeUNZy8/zUtcMqwfrilxuDw+9Gl+o+aXeVbwpkOw6D0bPeWkOwY0CkdyOKfwiW5tP4VUF70VOr drigocar@AC049707
-  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIjWNEUigHQV8Hjnb64XhrG6xApRNPhgxh1pUj3zrS0v5CsHT46ami3fceoNhsWsbl/A89xvMjBAg2mW74QzuK1sKfJQBLulpEPbILi0g2xOKL6M0LJSDmIfQPMkJQ6tWzb33dUZw2efLZsamseiKOTlj5zP2Kz1zSEVzL9mgt16T8+werKw5sRMvJjyBZY0QXCbAG7mkmjJxgGRPgBgV11fGCNyUV+TJ7h2u0HKpEC5A+PeTw2ZNHzKZc8nGtpkMbnUIT5WjjWxbOj2kDuyTGDwt8ix1ZVT3PFE0JQ9C3Jz4TFPKdl+Sfj5rYQ7W+lSIVkBo1zJtiZzJTdssdfxlv drigocar@AC049707
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9haOFUv8E17gBsMRKyVCta9EVYXF10nQJyZyYiooroVDrCb+h4DLUvhrIGXkR3HZviCZiQBjhpV/lbmAfEvc4JBlBdxKahpZ0I3h+Xm0tuhyDgIwCveAsPgVApjtetnBwHavncKuEqCYL9kez1AgDPknoL69/P3EfH5CNh+sLMkrlA5VNJ1izpUWYCSg71dWBN/2HEAxK2OgeKHkEFYwa36UnwswIXMX5SYte5MNmSEYeYhSWLmxbEi5oj1P6I7QMqsO08GMGaEWCNt+/E3l6X4HmxM78Xaxcbm13nKcAoz/tsSDkteZRIZAhTSMsdvZq/buNSRsKXtG4DBJlmp5F rodrigo@phoenix
 
 users:
   - name: "sysadmin"
@@ -137,14 +136,14 @@ write_files:
           K8S_IP=10.3.0.1
 
           # kubernetes workers setup
-          WORKER_NUMBER=3
+          WORKER_NUMBER=%SIZE%
           WORKERS_FQDN=("worker1" "worker2" "worker3")
           WORKERS_IP=("192.168.1.5" "192.168.1.6" "192.168.1.7")
           MASTER_IP=("192.168.1.20")
           K8S_SERVICE_IP=10.3.0.1
 
           # kubernetes master setup
-          ADV_IP=%HOSTNAME%
+          ADV_IP=192.168.1.%IP_ADDR%
           ETCD_END=http://10.1.0.%IP_ADDR%:2379
           K8S=v1.6.1_coreos.0
           NETWORK=
@@ -200,34 +199,6 @@ write_files:
           fi
           echo "Done ...";
 
-          create_worker
-
-        }
-
-        function create_worker()
-        {
-
-          echo "Generate the Kubernetes Worker Keypairs ...";
-
-          if [ ! -f /etc/kubernetes/ssl/worker*.pem -a ! -f /etc/kubernetes/ssl/worker*.csr ]; then
-            echo "Generating TLS keys."
-            openssl genrsa -out worker-key.pem 2048
-            WORKER_IP="${MASTER_IP}" openssl req -new -key worker-key.pem -out worker.csr -subj "/CN=worker" -config worker-openssl.cnf
-            WORKER_IP="${MASTER_IP}" openssl x509 -req -in worker.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out worker.pem -days 365 -extensions v3_req -extfile worker-openssl.cnf
-
-            for ((i=0; i <= "$WORKER_NUMBER" - 1; i++));
-            do
-              echo "${WORKERS_IP[i]}" --- "${WORKERS_FQDN[i]}";
-              openssl genrsa -out "${WORKERS_FQDN[i]}"-worker-key.pem 2048
-              WORKER_IP="${WORKERS_IP[i]}" openssl req -new -key "${WORKERS_FQDN[i]}"-worker-key.pem -out "${WORKERS_FQDN[i]}"-worker.csr -subj "/CN="${WORKERS_FQDN[i]}"" -config worker-openssl.cnf
-              WORKER_IP="${WORKERS_IP[i]}" openssl x509 -req -in "${WORKERS_FQDN[i]}"-worker.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out "${WORKERS_FQDN[i]}"-worker.pem -days 365 -extensions v3_req -extfile worker-openssl.cnf
-              sleep 2;
-              tar cfv "${WORKERS_FQDN[i]}".tgz ca.pem "${WORKERS_FQDN[i]}"-worker-key.pem "${WORKERS_FQDN[i]}"-worker.pem
-              tar tf "${WORKERS_FQDN[i]}".tgz
-              scp "${WORKERS_FQDN[i]}".tgz core@"${WORKERS_FQDN[i]}":~/
-            done
-          fi
-
           create_adminkey
 
         }
@@ -242,7 +213,34 @@ write_files:
            openssl req -new -key admin-key.pem -out admin.csr -subj "/CN=kube-admin"
            openssl x509 -req -in admin.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out admin.pem -days 365
           fi
+          
+          worker_keys
 
+        }
+
+        function worker_keys()
+        {
+          
+          echo "Generate the Kubernetes Worker Keypairs ...";
+
+          if [ ! -f /etc/kubernetes/ssl/worker*.pem -a ! -f /etc/kubernetes/ssl/worker*.csr ]; then
+            echo "Generating TLS keys."
+            openssl genrsa -out worker-key.pem 2048
+            WORKER_IP="${MASTER_IP}" openssl req -new -key worker-key.pem -out worker.csr -subj "/CN=worker" -config worker-openssl.cnf
+            WORKER_IP="${MASTER_IP}" openssl x509 -req -in worker.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out worker.pem -days 365 -extensions v3_req -extfile worker-openssl.cnf
+
+            for ((i=0; i <= "$WORKER_NUMBER"; i++));
+            do
+              echo "${WORKERS_IP[i]}" --- "${WORKERS_FQDN[i]}";
+              openssl genrsa -out "${WORKERS_FQDN[i]}"-worker-key.pem 2048
+              WORKER_IP="${WORKERS_IP[i]}" openssl req -new -key "${WORKERS_FQDN[i]}"-worker-key.pem -out "${WORKERS_FQDN[i]}"-worker.csr -subj "/CN="${WORKERS_FQDN[i]}"" -config worker-openssl.cnf
+              WORKER_IP="${WORKERS_IP[i]}" openssl x509 -req -in "${WORKERS_FQDN[i]}"-worker.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out "${WORKERS_FQDN[i]}"-worker.pem -days 365 -extensions v3_req -extfile worker-openssl.cnf
+              sleep 2;
+              tar cfv "${WORKERS_FQDN[i]}".tgz ca.pem "${WORKERS_FQDN[i]}"-worker-key.pem "${WORKERS_FQDN[i]}"-worker.pem
+              tar tf "${WORKERS_FQDN[i]}".tgz
+            done
+          fi
+         
           create_dirs
 
         }
@@ -309,14 +307,14 @@ write_files:
 
           echo "Saving settings ..."
           systemctl daemon-reload
-          systemctl restart etcd2
-          systemctl start kubelet
 
         }
 
         function setupkube()
         {
 
+          echo "Installing Kubelet and Calico ..."
+          
           sh /opt/bin/kubernetes-install.sh
           sh /opt/bin/calico-install.sh
 
@@ -337,7 +335,18 @@ write_files:
           curl http://127.0.0.1:8080/version
           curl -s localhost:10255/pods | jq -r '.items[].metadata.name'
 
+          send_worker_keys
         }
+
+        function send_worker_keys()
+        {
+          for ((i=0; i <= "%SIZE%"; i++));
+            do
+              scp "${WORKERS_FQDN[i]}".tgz core@"${WORKERS_FQDN[i]}":~/
+              sleep 2;
+            done
+        }
+        
         ############### Start Script ####################
         $@
 
@@ -843,7 +852,7 @@ coreos:
       enable: true
 
     - name: kubelet.service
-      command: restart
+      command: start
       enable: true
       
     - name: flanneld.service

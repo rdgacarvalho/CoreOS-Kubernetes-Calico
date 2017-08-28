@@ -3,9 +3,7 @@
 hostname: %HOSTNAME%
 
 ssh_authorized_keys:
-  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCWM7xMnzcy1hTjxoV7/Cc8lSeoWhUUPsoNbFSkL9wiLq++SqscipEeA3HRYlI7X9VJbhCWRYAA5AKj7hGMZ60sByzvo8nSJVN54zcOfH5wnJKdO3FJeQfYkyqYsBpC8Kg0+dILtvhxgf5KenFQkPnb8DXmNExvm/jzJgu2YbOSmKcSvt9zQnHTj7AAILC8GozYonJEzE5Yo8JiKUbVSBq9lL54dbi/47QhfhIjKbK7n4+tbsU/aLPKauv+NW2jj69tIycg6WnoarSeUNZy8/zUtcMqwfrilxuDw+9Gl+o+aXeVbwpkOw6D0bPeWkOwY0CkdyOKfwiW5tP4VUF70VOr drigocar@AC049707
-  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIjWNEUigHQV8Hjnb64XhrG6xApRNPhgxh1pUj3zrS0v5CsHT46ami3fceoNhsWsbl/A89xvMjBAg2mW74QzuK1sKfJQBLulpEPbILi0g2xOKL6M0LJSDmIfQPMkJQ6tWzb33dUZw2efLZsamseiKOTlj5zP2Kz1zSEVzL9mgt16T8+werKw5sRMvJjyBZY0QXCbAG7mkmjJxgGRPgBgV11fGCNyUV+TJ7h2u0HKpEC5A+PeTw2ZNHzKZc8nGtpkMbnUIT5WjjWxbOj2kDuyTGDwt8ix1ZVT3PFE0JQ9C3Jz4TFPKdl+Sfj5rYQ7W+lSIVkBo1zJtiZzJTdssdfxlv drigocar@AC049707
-
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9haOFUv8E17gBsMRKyVCta9EVYXF10nQJyZyYiooroVDrCb+h4DLUvhrIGXkR3HZviCZiQBjhpV/lbmAfEvc4JBlBdxKahpZ0I3h+Xm0tuhyDgIwCveAsPgVApjtetnBwHavncKuEqCYL9kez1AgDPknoL69/P3EfH5CNh+sLMkrlA5VNJ1izpUWYCSg71dWBN/2HEAxK2OgeKHkEFYwa36UnwswIXMX5SYte5MNmSEYeYhSWLmxbEi5oj1P6I7QMqsO08GMGaEWCNt+/E3l6X4HmxM78Xaxcbm13nKcAoz/tsSDkteZRIZAhTSMsdvZq/buNSRsKXtG4DBJlmp5F rodrigo@phoenix
 users:
   - name: "sysadm"
     passwd: "$1$gTl7Qanp$t7EqB9bqKGdyFUbFC4rH0."
@@ -13,8 +11,7 @@ users:
       - "sudo"
       - "docker"
     ssh-authorized-keys:
-    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCWM7xMnzcy1hTjxoV7/Cc8lSeoWhUUPsoNbFSkL9wiLq++SqscipEeA3HRYlI7X9VJbhCWRYAA5AKj7hGMZ60sByzvo8nSJVN54zcOfH5wnJKdO3FJeQfYkyqYsBpC8Kg0+dILtvhxgf5KenFQkPnb8DXmNExvm/jzJgu2YbOSmKcSvt9zQnHTj7AAILC8GozYonJEzE5Yo8JiKUbVSBq9lL54dbi/47QhfhIjKbK7n4+tbsU/aLPKauv+NW2jj69tIycg6WnoarSeUNZy8/zUtcMqwfrilxuDw+9Gl+o+aXeVbwpkOw6D0bPeWkOwY0CkdyOKfwiW5tP4VUF70VOr drigocar@AC049707
-    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD037qxy/sqLljZ/50+jFFTArgx0SYRytQcRIbIvUusdLG5CK/oHF+ZfSNZLNQUFuKyaUOJWXaug7VOzqIGliaNvXsoB5iKTP5RXdFXdZ2oCzPx/bXbCdxqfvV78GVIb0o/r4xI8xlR326gwDhDpb/Oy0R2PP98VBLhIWc1T5C4zGESd/IuPmWHEYl4c4ctG1qVgaOIz52RawM22Q/4jXpAbitFiKMJxyz6olQy61zZ9e77u9Ad4c2cHW8gTGiz8eYCR5dTHV38jFk7NxwHzYWdHQ0XmbVRXgzHuLQjCwfkpuqDvZujoam8deDwcdbESgqalugLKHANv8+bjiqnc1EZ root@glaedr.ellesmera
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9haOFUv8E17gBsMRKyVCta9EVYXF10nQJyZyYiooroVDrCb+h4DLUvhrIGXkR3HZviCZiQBjhpV/lbmAfEvc4JBlBdxKahpZ0I3h+Xm0tuhyDgIwCveAsPgVApjtetnBwHavncKuEqCYL9kez1AgDPknoL69/P3EfH5CNh+sLMkrlA5VNJ1izpUWYCSg71dWBN/2HEAxK2OgeKHkEFYwa36UnwswIXMX5SYte5MNmSEYeYhSWLmxbEi5oj1P6I7QMqsO08GMGaEWCNt+/E3l6X4HmxM78Xaxcbm13nKcAoz/tsSDkteZRIZAhTSMsdvZq/buNSRsKXtG4DBJlmp5F rodrigo@phoenix
 
 write_files:
 
@@ -26,7 +23,7 @@ write_files:
          10.1.0.6        worker2 worker2.ellesmera.intranet
          192.168.1.7     node3 node3.ellesmera.intranet
          10.1.0.7        worker3 worker3.ellesmera.intranet
-         192.168.1.20    kubemaster kubemaster.ellesmera.intranet
+         192.168.1.20    kubemaster1 kubemaster1.ellesmera.intranet
          10.1.0.20       master1 master1.ellesmera.intranet
 
   - path: /etc/resolv.conf
@@ -238,6 +235,7 @@ write_files:
           NETWORK=
           SERVICE_IP=10.3.0.0/24
           DNS_SERVICE=10.3.0.10
+          WORKER_SIZE=%SIZE%
 
           create_dirs
 
@@ -270,6 +268,15 @@ write_files:
           eval sed -i -e 's#\\\${MASTER_HOST}#"$MASTER"#g' /etc/kubernetes/manifests/kube-proxy.yaml
           eval sed -i -e 's#\\\${K8S_VER}#"$K8S"#g' /etc/kubernetes/manifests/kube-proxy.yaml
 
+          daemon_reload
+
+        }
+
+        function daemon_reload()
+        { 
+
+          echo "Saving settings ..."
+          systemctl daemon-reload
 
         }
 
@@ -381,6 +388,10 @@ coreos:
       enable: true
 
     - name: kubeconfig.service
+      command: start
+      enable: true
+
+    - name: kubelet.service
       command: start
       enable: true
 
