@@ -20,8 +20,8 @@ write_files:
     - path: /etc/hosts
       owner: root
       content: |
-             192.168.1.%IP_ADDR%   %HOSTNAME% %HOSTNAME%.ellesmera.intranet
-             10.1.0.%IP_ADDR%      master1 master1.ellesmera.intranet
+             192.168.1.%IP_ADDR%  master1 master1.ellesmera.intranet
+             10.1.0.%IP_ADDR%   %HOSTNAME% %HOSTNAME%.ellesmera.intranet
              192.168.1.5    node1 node1.ellesmera.intranet
              10.1.0.5       worker1 worker1.ellesmera.intranet
              192.168.1.6    node2 node2.ellesmera.intranet
