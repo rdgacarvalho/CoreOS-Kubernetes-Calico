@@ -195,6 +195,23 @@ write_files:
         chmod +x /opt/bin/kubelet /opt/bin/kubectl
       fi
 
+  - path: /opt/bin/calico-install.sh
+    owner: root
+    content: |
+      #! /usr/bin/bash
+
+      if [ ! -f /opt/bin/calicoctl ]; then
+        echo "Calico not installed - installing."
+
+        # Install the `calicoctl` binary
+        wget https://github.com/projectcalico/calicoctl/releases/download/v1.0.2/calicoctl
+        chmod +x calicoctl
+        mv calicoctl /opt/bin
+
+        # Fetch the calico/node container
+        sudo docker pull calico/node:v0.14.0
+      fi
+
   - path: /etc/kubernetes/ssl/kubeconfig.sh
     owner: root
     content: |
@@ -266,6 +283,7 @@ write_files:
         function setupkube()
         {
           sh kubernetes-install.sh
+          sh calico-install.sh
 
           find ~core/ -type f -name '*.tgz' -exec sudo tar xfv {} \;
 
