@@ -97,22 +97,6 @@ write_files:
           sudo chmod +x /opt/bin/kubelet /opt/bin/kubectl
         fi
 
-    # Calico Script Install
-    - path: /opt/bin/calico-install.sh
-      owner: root
-      permissions: 0755
-      content: |
-        #! /usr/bin/bash
-        if [ ! -f /opt/bin/calicoctl ]; then
-          echo "Calico not installed - installing."
-          # Install the `calicoctl` binary
-          wget https://github.com/projectcalico/calicoctl/releases/download/v1.0.2/calicoctl
-          chmod +x calicoctl
-          mv calicoctl /opt/bin
-          # Fetch the calico/node container
-          docker pull calico/node:v0.14.0
-        fi
-
     #Kubernetes Script Config
     - path: /etc/kubernetes/ssl/kubeconfig.sh
       owner: root
@@ -316,7 +300,6 @@ write_files:
           echo "Installing Kubelet and Calico ..."
           
           sh /opt/bin/kubernetes-install.sh
-          sh /opt/bin/calico-install.sh
 
           /opt/bin/kubectl config set-cluster default-cluster --server=https://"${MASTER_HOST}" --certificate-authority="${CA_CERT}"
           /opt/bin/kubectl config set-credentials default-admin --certificate-authority="${CA_CERT}" --client-key="${ADMIN_KEY}" --client-certificate="${ADMIN_CERT}"
