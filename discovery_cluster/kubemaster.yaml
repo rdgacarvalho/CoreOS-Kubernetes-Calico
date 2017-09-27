@@ -342,7 +342,7 @@ write_files:
         {
           for ((i=0; i <= "%SIZE%"; i++));
             do
-              scp "${WORKERS_FQDN[i]}".tgz core@"${WORKERS_FQDN[i]}":~/
+              scp worker$i.tgz core@worker$i:~/
               sleep 2;
             done
         }
