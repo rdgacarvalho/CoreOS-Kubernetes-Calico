@@ -20,8 +20,8 @@ write_files:
     - path: /etc/hosts
       owner: root
       content: |
-             192.168.1.%IP_ADDR%  master1 master1.ellesmera.intranet
-             10.1.0.%IP_ADDR%   %HOSTNAME% %HOSTNAME%.ellesmera.intranet
+             192.168.1.%IP_ADDR% %HOSTNAME% %HOSTNAME%.ellesmera.intranet 
+             10.1.0.%IP_ADDR%   master1 master1.ellesmera.intranet
              192.168.1.5    node1 node1.ellesmera.intranet
              10.1.0.5       worker1 worker1.ellesmera.intranet
              192.168.1.6    node2 node2.ellesmera.intranet
@@ -309,8 +309,19 @@ write_files:
           curl -H "Content-Type: application/json" -XPOST -d'{"apiVersion":"v1","kind":"Namespace","metadata":{"name":"kube-system"}}' "http://127.0.0.1:8080/api/v1/namespaces"
           curl -H "Content-Type: application/json" -XPOST -d'{"apiVersion":"v1","kind":"Namespace","metadata":{"name":"calico-system"}}' "http://127.0.0.1:8080/api/v1/namespaces"
 
-          valid_kubernetes
+          send_worker_keys
+        }
 
+        function send_worker_keys()
+        {
+          for ((i=1; i <= "%SIZE%"; i++));
+            do
+              ssh worker$i "sudo systemctl stop etcd2"
+              ssh worker$i "etcd2 --heartbeat-interval=300 --election-timeout=15000"
+              scp worker$i.tgz core@worker$i:~/
+              ssh worker$i "sudo systemctl start etcd2"
+              sleep 2;
+            done
         }
 
         function valid_kubernetes()
@@ -318,16 +329,6 @@ write_files:
           curl http://127.0.0.1:8080/version
           curl -s localhost:10255/pods | jq -r '.items[].metadata.name'
 
-          send_worker_keys
-        }
-
-        function send_worker_keys()
-        {
-          for ((i=0; i <= "%SIZE%"; i++));
-            do
-              scp worker$i.tgz core@worker$i:~/
-              sleep 2;
-            done
         }
         
         ############### Start Script ####################
