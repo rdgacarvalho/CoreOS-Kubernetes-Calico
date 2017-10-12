@@ -19,7 +19,7 @@ Kubernetes is an open-source system for automating deployment, scaling, and mana
 * [Storage orchestration]
 * [Batch execution]
 
-# What are you found there?
+# What are you will found here?
 
 * How to create a CoreOS cluster (static) with Kubernetes v1.6.1 on bare metal (Libvirt)
 * How to create a CoreOS cluster (dynamic) with Kubernetes v1.6.1 on bare metal (Libvirt)
