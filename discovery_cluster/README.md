@@ -1,8 +1,8 @@
 # Install CoreOS Linux Container Static Cluster
 
-After define your networking information like "IP Address and Hostnames", replace the variables inside kubemaster.yaml.
+After define your networking information like "IP Address and Hostnames", please replace all variables inside kubemaster.yaml file. Pay attention, remember to replace the domain name "ellesmera.com" for your own domain, before start install your cluster.
 
-## Pay attention: All changes should be made into static_cluster/ files
+## Pay attention: All changes should be make into static_cluster/ files
 
 ## Installing Kubernetes Master - Static Cluster
 
