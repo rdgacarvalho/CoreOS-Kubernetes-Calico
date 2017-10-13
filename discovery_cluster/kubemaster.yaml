@@ -309,22 +309,21 @@ write_files:
           curl -H "Content-Type: application/json" -XPOST -d'{"apiVersion":"v1","kind":"Namespace","metadata":{"name":"kube-system"}}' "http://127.0.0.1:8080/api/v1/namespaces"
           curl -H "Content-Type: application/json" -XPOST -d'{"apiVersion":"v1","kind":"Namespace","metadata":{"name":"calico-system"}}' "http://127.0.0.1:8080/api/v1/namespaces"
 
-          send_worker_keys
         }
 
-        function send_worker_keys()
+        function setupworkers()
         {
           for ((i=1; i <= "%SIZE%"; i++));
             do
-              ssh worker$i "sudo systemctl stop etcd2"
-              ssh worker$i "etcd2 --heartbeat-interval=300 --election-timeout=15000"
+              ssh worker$i "sudo systemctl stop etcd2" && \
+              ssh worker$i "etcd2 --heartbeat-interval=300 --election-timeout=15000" 
               scp worker$i.tgz core@worker$i:~/
               ssh worker$i "sudo systemctl start etcd2"
               sleep 2;
             done
         }
 
-        function valid_kubernetes()
+        function validkube()
         {
           curl http://127.0.0.1:8080/version
           curl -s localhost:10255/pods | jq -r '.items[].metadata.name'

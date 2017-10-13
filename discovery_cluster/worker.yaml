@@ -283,7 +283,7 @@ write_files:
         function setupkube()
         {
           sh kubernetes-install.sh
-          sh calico-install.sh
+          #sh calico-install.sh
 
           find ~core/ -type f -name '*.tgz' -exec sudo tar xfv {} \;
 
